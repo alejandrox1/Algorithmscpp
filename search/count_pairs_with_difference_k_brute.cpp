@@ -17,7 +17,7 @@ int countPairsWithDiffK(std::vector<int> &arr, int n, int k) {
 }
 
 
-void runTest(int testSize, int k) {
+int runTest(int testSize, int k) {
 	std::vector<int> arr;
 	for (int i=0; i<testSize; i++) {
 		arr.push_back(i);
@@ -31,15 +31,22 @@ void runTest(int testSize, int k) {
 				                                                                                
 	std::cout<< "Array size: "<< testSize << ", Duration: "<<duration <<" microseconds.\n\n";
 
+	return int(duration);
 }
 
 int main() {
 
-	runTest(10, 3);
-	runTest(100, 3);
-	runTest(1000, 3);
-	runTest(10000, 3);
-	runTest(100000, 3);
+	std::vector<int> durations;
+
+	durations.push_back( runTest(10, 3) );
+	durations.push_back( runTest(100, 3) );
+	durations.push_back( runTest(1000, 3) );
+	durations.push_back( runTest(10000, 3) );
+	durations.push_back( runTest(100000, 3) );
+
+	for (int i=durations.size()-1; i>0; i--) {
+		std::cout<< durations[i]/durations[i-1] <<'\n';
+	}
 
 	return 0;
 }
