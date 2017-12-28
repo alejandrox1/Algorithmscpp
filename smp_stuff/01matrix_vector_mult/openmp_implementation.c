@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 		for (j=0; j<n; j++)
 			b[i*n + j] = i;
 
-	printf("Executing the mxv function for m = %d and n = %d\n", m, d);
+	printf("Executing the mxv function for m = %d and n = %d\n", m, n);
 	(void) mxv(m, n, a, b, c);
 
 	free(a); free(b); free(c);
@@ -45,13 +45,15 @@ int main(int argc, char *argv[]) {
 }
 
 // Row invariant of the problem.
-void (int m, int n, double * restrict a, double * restrict b, double * restrict c) {
+void mxv(int m, int n, double * restrict a, double * restrict b, double * restrict c) {
 	int i, j;
+
+#pragma omp parallel for default(none) shared(m,n,a,b,c) private(i,j)
 	for (i=0; i<m; i++) {
 		a[i] = 0.0;
 		// Dot product of row i of b with c.
 		for (j=0; j<n; j++) {
-			a[i] += b[i*n + j] * c[j]
+			a[i] += b[i*n + j] * c[j];
 		}
 	}
 }
