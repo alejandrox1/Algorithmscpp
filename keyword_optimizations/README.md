@@ -16,3 +16,8 @@ objdump -S --disassemble code > code.dump
 
 This option works best if debugging option is enabled for the object file (-g
 at compilation time) and the file hasn't been stripped.
+
+## Sources
+* [Realistic usage of the c99 restrict keyword](https://stackoverflow.com/questions/745870/realistic-usage-of-the-c99-restrict-keyword)
+
+* [restrict, static, and inline](https://wr.informatik.uni-hamburg.de/_media/teaching/wintersemester_2013_2014/epc-1314-fasselt-c-keywords-report.pdf)
