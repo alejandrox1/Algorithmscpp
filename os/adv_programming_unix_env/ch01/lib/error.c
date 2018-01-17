@@ -15,6 +15,14 @@ static void err_doit(int errnoflag, int error, const char *fmt, va_list ap) {
     fflush(NULL);       // Flushes all stdio output streams.                    
 }
 
+// Non-fatal error related to a system call. Print a message then return.
+void err_ret(const char *fmt, ...) {
+	va_list ap;
+
+	va_start(ap, fmt);
+	err_doit(1, errno, fmt, ap);
+	va_end(ap);
+}
 
 // Fatal error, unrelated to a system call. Print a message then terminate.
 void err_quit(const char *fmt, ...) {
