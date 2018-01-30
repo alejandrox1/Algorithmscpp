@@ -21,7 +21,7 @@
 int main()
 {
 	int status;
-	char str[100]; //*str = (char *)malloc(BUFF_SIZE); 		/* Allocate 1MB .*/
+	char str[100]; 
 	int listen_fd, comm_fd;
 
 	struct sockaddr_in servaddr;
@@ -90,7 +90,7 @@ int main()
 			int client_status;
 			while (1)
 			{
-				client_status = check_client_connection(comm_fd);
+				client_status = check_socket(comm_fd);
 				if (client_status < 1)
 					break;
 
@@ -102,9 +102,10 @@ int main()
 				write(comm_fd, str, strlen(str)+1);
 			}
 		}
-		close(comm_fd);
+		close_socket(comm_fd);
 	}
 
-	free(str);
+	shutdown(listen_fd, SHUT_RDWR);
+	close(listen_fd);
 	exit(0);
 }

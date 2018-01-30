@@ -11,3 +11,6 @@ Valid socket types are:
 
 When a process should bind a socket to a local interface address using `bind`
 when looking to receive an incoming packet or connection (`man ip`).
+
+# TO-DO:
+* Graceful server shut down (at the very least catch SIGINT, SIGKILL, SIGHUP).
