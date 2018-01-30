@@ -95,7 +95,7 @@ void unlock(int process)
 void* func(void* s)
 {
 	int i;
-	int self = *(int*)s;
+	//int self = *(int*)s;
 	
 	printf("Thread %d entered...\n", self);
 
