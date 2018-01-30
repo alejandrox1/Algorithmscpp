@@ -1,7 +1,6 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #define NUMBER_OF_THREADS 10
 
@@ -30,6 +29,5 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	sleep(5);
 	exit(0);
 }
