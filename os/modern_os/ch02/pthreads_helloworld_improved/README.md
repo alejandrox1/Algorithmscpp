@@ -34,4 +34,5 @@ Hello from 9
   operations), it doesn't allow to wait until another thread completes a given
   activity.
 
-### TODO: Add more on `pthread_cond_t`  
+### TODO: Add more on `pthread_cond_t` 
+* [Condition variables](https://www.cs.nmsu.edu/~jcook/Tools/pthreads/pthread_cond.html)
