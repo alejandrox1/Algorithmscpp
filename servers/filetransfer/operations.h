@@ -2,16 +2,17 @@
 #define __OPERATIONS_H__
 
 #include <arpa/inet.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include "utilities.h"
 
+#define BUFFSIZE 1024
 
-#define BUFFSIZE 100
 
 
 void echoClient(int *sockfd)
 {
-	char buff[100];
+	char buff[BUFFSIZE];
 	char ip[INET6_ADDRSTRLEN];
 	int client_status, commfd = *sockfd;      
 
@@ -34,24 +35,64 @@ void echoClient(int *sockfd)
 	}
 }
 
-
-void sendFile(int *sockfd)
+int sendFile(int sockfd, const void * buff, int len)
 {
-	int commfd = *sockfd;
-	char buff[BUFFSIZE];
-	FILE *file = fopen("sent.txt", "r");
-	if (file == NULL)
+	const char *pbuff = (const char *)buff;
+
+	while (len > 0)
 	{
-		fprintf(stderr, "Error opening file");
-		return;
+		int sent = send(sockfd, pbuff, len, 0);
+		if (sent < 1)
+		{
+			fprintf(stderr, "cannot write to socket");
+			return -1;
+		}
+		pbuff += sent;
+		len -= sent;
 	}
-	while (!feof(file))
-	{
-		int rval = fread(buff, 1, sizeof(buff), file);
-		send(commfd, buff, rval, 0);
-	}
+	return 0;
 }
 
+void serverSendFile(int sockfd)
+{
+	const char* filename = "sent.txt";
+	char buff[BUFFSIZE];
+	struct stat s;
+
+	if (stat(filename, &s) < 0)
+	{
+		fprintf(stderr, "Cannot stat file\n");
+		return;
+	}
+
+	FILE *file = fopen(filename, "rb");
+	if (file == NULL)                                                           
+    {                                                                           
+        fprintf(stderr, "Error opening file");                                  
+        return;                                                                 
+    }	
+
+	long size = s.st_size;
+	long tmpSize = htonl(size);
+	if (sendFile(sockfd, &tmpSize, sizeof(tmpSize)) == 0)
+	{
+		while (size > 0)
+		{
+			int n = fread(buff, 1, MIN(sizeof(buff), size), file);
+			if (n < 1)
+			{
+				fprintf(stderr, "cannot read from file\n");
+				break;
+			}
+
+			if (sendFile(sockfd, buff, n) < 0)
+				break;
+
+			size -= n;
+		}
+	}
+	fclose(file);
+}
 
 
 #endif // __OPERATIONS_H__

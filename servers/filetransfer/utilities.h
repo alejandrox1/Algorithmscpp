@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <string.h>
 
+#define MIN(x,y) (((x) < (y)) ? (x) : (y))
 #define ERRMSG 1024
 
 
