@@ -10,16 +10,17 @@ void echoClient(int *sockfd)
 {
 	char buff[100];
 	char ip[INET6_ADDRSTRLEN];
-	int client_status, commfd = *sockfd;        
+	int client_status, commfd = *sockfd;      
+
 	bzero(ip, sizeof(ip));
+	getClientIP(commfd, ip, INET6_ADDRSTRLEN);
+
 	while (1)                                                           
 	{                                                                   
 		client_status = checkSocket(commfd);                     
 		if (client_status < 1)
 		{
-			getClientIP(commfd, ip);
 			fprintf(stdout, "Connection %s broken\n", ip);
-			bzero(ip, sizeof(ip));
 			break;     
 		}
                                                                                 

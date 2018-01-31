@@ -46,7 +46,7 @@ int checkSocket(int socketfd)
 }
 
 
-void getClientIP(int commfd, char *ip)
+void getClientIP(int commfd, char ip[], size_t size)
 {
 	char errmsg[ERRMSG];
 	struct sockaddr_storage addr;
@@ -64,12 +64,12 @@ void getClientIP(int commfd, char *ip)
 	if (addr.ss_family == AF_INET)
 	{
 		struct sockaddr_in *s = (struct sockaddr_in *)&addr;
-		inet_ntop(AF_INET, &s->sin_addr, ip, sizeof(ip));
+		inet_ntop(AF_INET, &s->sin_addr, ip, size);
 	} 
 	else
 	{
 		struct sockaddr_in6 *s = (struct sockaddr_in6 *)&addr;
-		inet_ntop(AF_INET6, &s->sin6_addr, ip, sizeof(ip));
+		inet_ntop(AF_INET6, &s->sin6_addr, ip, size);
 	}
 }
 
