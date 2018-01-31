@@ -56,7 +56,7 @@ int main()
 			{
 				continue;
 			}
-			exit(-1);
+			break;
 			
 		}
 		// Process client reuests.
