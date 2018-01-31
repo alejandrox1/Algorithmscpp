@@ -45,7 +45,7 @@ int checkSocket(int socketfd)
 	return 1;
 }
 
-
+// getClientIP gets the IP address of client connection to server.
 void getClientIP(int commfd, char ip[], size_t size)
 {
 	char errmsg[ERRMSG];
