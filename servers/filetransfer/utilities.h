@@ -12,12 +12,10 @@
 
 
 // getError returns error message.
-char* getError(int n, char* errmsg)
+void getError(int n, char* errmsg)
 {
 	// TODO: better error handling here... 
-	if (strerror_r(n, errmsg, ERRMSG) < 0)
-		return "";
-	return buff;
+	strerror_r(n, errmsg, ERRMSG);
 }
 
 
@@ -33,32 +31,34 @@ int checkSocket(int socketfd)
 	status = getsockopt(socketfd, SOL_SOCKET, SO_ERROR, &err, &len);
 	if (status != 0)
 	{
-		fprintf(stderr, "Error getting socket error code: %s\n", getError(status));
+		getError(status, errmsg);
+		fprintf(stderr, "Error getting socket error code: %s\n", errmsg);
 		return -1;
 	}
 	if (err != 0)
 	{
 		errno = err;
-		fprintf(stdout, "socket error: %s\n", getError(err));
+		getError(err, errmsg);
+		fprintf(stdout, "socket error: %s\n", errmsg);
 		return 0;
 	}
 	return 1;
 }
 
 
-char* getClientIP(int commfd)
+void getClientIP(int commfd, char *ip)
 {
-
+	char errmsg[ERRMSG];
 	struct sockaddr_storage addr;
 	socklen_t len = sizeof(addr);
-	char ip[INET6_ADDRSTRLEN];
 	int status;
 
 	status = getpeername(commfd, (struct sockaddr*)&addr, &len);
 	if (status < 0)
 	{
-		fprintf(stderr, "Error getting. %s\n", getError(errno));
-		return "";
+		getError(errno, errmsg);
+		fprintf(stderr, "Error getting. %s\n", errmsg);
+		return;
 	}
 
 	if (addr.ss_family == AF_INET)
@@ -71,7 +71,6 @@ char* getClientIP(int commfd)
 		struct sockaddr_in6 *s = (struct sockaddr_in6 *)&addr;
 		inet_ntop(AF_INET6, &s->sin6_addr, ip, sizeof(ip));
 	}
-	return ip;
 }
 
 

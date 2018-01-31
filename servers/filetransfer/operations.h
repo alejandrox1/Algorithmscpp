@@ -1,6 +1,7 @@
 #ifndef __OPERATIONS_H__
 #define __OPERATIONS_H__
 
+#include <arpa/inet.h>
 #include "utilities.h"
 
 #define BUFFSIZE 100
@@ -8,13 +9,17 @@
 void echoClient(int *sockfd)
 {
 	char buff[100];
-	int client_status, commfd = *sockfd;                                                  
+	char ip[INET6_ADDRSTRLEN];
+	int client_status, commfd = *sockfd;        
+	bzero(ip, sizeof(ip));
 	while (1)                                                           
 	{                                                                   
 		client_status = checkSocket(commfd);                     
 		if (client_status < 1)
 		{
-			fprintf(stdout, "Connection %s broken\n", getClientIP(commfd));
+			getClientIP(commfd, ip);
+			fprintf(stdout, "Connection %s broken\n", ip);
+			bzero(ip, sizeof(ip));
 			break;     
 		}
                                                                                 

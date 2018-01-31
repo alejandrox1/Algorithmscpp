@@ -13,7 +13,7 @@
 #define CONNPORT "22000"
 #define CONNMAX 1000
 #define CONNBACKLOG 1000
-
+#define ERRMSG 1024
 
 int listenfd;
 int clients[CONNMAX];
@@ -23,6 +23,7 @@ void startServer();
 
 int main()
 {
+	char errmsg[ERRMSG];
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	int slot = 0;
@@ -46,8 +47,9 @@ int main()
 			
 		// Error accepting connection.
 		if (clients[slot] < 0)
-		{
-			fprintf(stderr, "Error accepting request. %s\n", getError(errno));
+		{	
+			getError(errno, errmsg);
+			fprintf(stderr, "Error accepting request. %s\n", errmsg);
 			if((errno == ENETDOWN || errno == EPROTO || errno == ENOPROTOOPT || 
 						errno == EHOSTDOWN || errno == ENONET || 
 						errno == EHOSTUNREACH || errno == EOPNOTSUPP || 
@@ -78,6 +80,7 @@ int main()
 void startServer() 
 {
 	int status;
+	char errmsg[ERRMSG];
 	char port[6];
 	strcpy(port, CONNPORT);
 	struct addrinfo hints, *res, *p;
@@ -90,20 +93,23 @@ void startServer()
 	status = getaddrinfo(NULL, port, &hints, &res);
 	if (status != 0)
 	{
-		fprintf(stderr, "Error in getaddrinfo. %s\n", getError(errno));
+		getError(errno, errmsg);
+		fprintf(stderr, "Error in getaddrinfo. %s\n", errmsg);
 		exit(1);
 	}
 
 	// Bind a socket.
 	for (p=res; p!=NULL; p=p->ai_next)
 	{
+		bzero(errmsg, sizeof(errmsg));
 		// Creates and endpoint for communication and return a file descriptor.     
 		// The first argument specifies the communication domain; selects the 
 		// protocol family to be used.                                           
 		listenfd = socket(p->ai_family, p->ai_socktype, 0);                           
 		if (listenfd < 0)                                                          
-		{                                                                           
-			fprintf(stderr, "Error creating a socket. %s\n", getError(errno));      
+		{                                                   
+			getError(errno, errmsg);
+			fprintf(stderr, "Error creating a socket. %s\n", errmsg);      
 			continue;                        
 		}
 		// Bind a name to a socket. Assign the address specified by servaddr to 
@@ -114,8 +120,9 @@ void startServer()
 	}
 	if (p==NULL)
 	{
-		fprintf(stderr, "Error creating or binding address to socket. %s\n", getError(errno));
-		exit(-1);                                                               
+		getError(errno, errmsg);
+		fprintf(stderr, "Error creating or binding address to socket. %s\n", errmsg);
+		exit(1);             
 	}
 
 	// Free the dynamically allocated linked list res.
@@ -127,7 +134,8 @@ void startServer()
 	status = listen(listenfd, CONNBACKLOG);
 	if (status < 0)
 	{
-		fprintf(stderr, "Error while marking listenfd as passive socket. %s\n", getError(errno));
+		getError(errno, errmsg);
+		fprintf(stderr, "Error while marking listenfd as passive socket. %s\n", errmsg);
 		exit(-1);
 	}
 }
