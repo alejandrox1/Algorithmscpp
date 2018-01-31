@@ -1,37 +1,36 @@
 #ifndef __UTILITIES_H__
 #define __UTILITIES_H__
 
+#include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
 
+#define ERRMSG 1024
+
 
 // getError returns error message.
-char* getError(int n)
+char* getError(int n, char* errmsg)
 {
-	size_t size = 1024;
-	char *buff = (char *) malloc(size);
-	if (buff == NULL)
-		return NULL;
-
 	// TODO: better error handling here... 
-	if (strerror_r(n, buff, size) < 0)
-		return NULL;
+	if (strerror_r(n, errmsg, ERRMSG) < 0)
+		return "";
 	return buff;
 }
 
 
 // checkSocket is used to check whether a client is still connected and to
 // clear out any errors before shutting down. 
-int checkSocket(int socket_fd)
+int checkSocket(int socketfd)
 {
 	int err = 0;
+	char errmsg[ERRMSG];
 	socklen_t len = sizeof(err);
 	int status;
 
-	status = getsockopt(socket_fd, SOL_SOCKET, SO_ERROR, &err, &len);
+	status = getsockopt(socketfd, SOL_SOCKET, SO_ERROR, &err, &len);
 	if (status != 0)
 	{
 		fprintf(stderr, "Error getting socket error code: %s\n", getError(status));
@@ -47,21 +46,50 @@ int checkSocket(int socket_fd)
 }
 
 
+char* getClientIP(int commfd)
+{
+
+	struct sockaddr_storage addr;
+	socklen_t len = sizeof(addr);
+	char ip[INET6_ADDRSTRLEN];
+	int status;
+
+	status = getpeername(commfd, (struct sockaddr*)&addr, &len);
+	if (status < 0)
+	{
+		fprintf(stderr, "Error getting. %s\n", getError(errno));
+		return "";
+	}
+
+	if (addr.ss_family == AF_INET)
+	{
+		struct sockaddr_in *s = (struct sockaddr_in *)&addr;
+		inet_ntop(AF_INET, &s->sin_addr, ip, sizeof(ip));
+	} 
+	else
+	{
+		struct sockaddr_in6 *s = (struct sockaddr_in6 *)&addr;
+		inet_ntop(AF_INET6, &s->sin6_addr, ip, sizeof(ip));
+	}
+	return ip;
+}
+
+
 // closeSocket will gracefully shut down and close a socket.
-void closeSocket(int comm_fd)
+void closeSocket(int commfd)
 {
 	int status;
-	if (comm_fd > 0)
+	if (commfd > 0)
 	{
 		// Clear errors to prevent close from failing.
-		checkSocket(comm_fd);
+		checkSocket(commfd);
 
-		status = shutdown(comm_fd, SHUT_RDWR);
+		status = shutdown(commfd, SHUT_RDWR);
 		if (status < 0)
 			if (errno != ENOTCONN && errno != EINVAL)
 				perror("shutting down client socket");
 		
-		status = close(comm_fd);
+		status = close(commfd);
 		if (status < 0)
 			perror("closing client socket");
 	}

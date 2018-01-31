@@ -7,9 +7,9 @@
 #include <errno.h>
 #include <unistd.h>
 #include "utilities.h"
+#include "operations.h"
 
 
-#define BUFF_SIZE (1024*1024)
 #define CONNPORT "22000"
 #define CONNMAX 1000
 #define CONNBACKLOG 1000
@@ -23,7 +23,6 @@ void startServer();
 
 int main()
 {
-	char str[100]; 
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	int slot = 0;
@@ -62,22 +61,11 @@ int main()
 		// Process client reuests.
 		else 
 		{
-			int client_status;
-			while (1)
-			{
-				client_status = checkSocket(clients[slot]);
-				if (client_status < 1)
-					break;
-
-				bzero(str, 100);
-				read(clients[slot], str, 100);
-
-				fprintf(stdout, "Echoing back: %s\n", str);
-
-				write(clients[slot], str, strlen(str)+1);
-			}
+			echoClient(&clients[slot]);
 		}
 		closeSocket(clients[slot]);
+		clients[slot] = -1;
+		slot = (slot+1) % CONNMAX;
 	}
 
 	shutdown(listenfd, SHUT_RDWR);
