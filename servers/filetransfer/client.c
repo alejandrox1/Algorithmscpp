@@ -6,17 +6,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "utilities.h"
+#include "clientops.h"
 
 
-#define BUFF_SIZE (1024*1024)
 #define CONN_PORT 22000
+#define ERRMSG 1024
 
 
 int main(int argc, char **argv)
 {
+	int status;
+	char errmsg[ERRMSG];
 	int sockfd;
-	char sendline[100]; 
-	char recvline[100];
 	struct sockaddr_in servaddr;
 
 	bzero(&servaddr, sizeof(servaddr));                                        
@@ -25,22 +27,27 @@ int main(int argc, char **argv)
 	inet_pton(AF_INET, "127.0.0.1", &(servaddr.sin_addr));
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd < 0)
+	{
+		getError(errno, errmsg);
+		fprintf(stderr, "Error creating a socket. %s\n", errmsg);           
+		exit(1);
+	}
 
 	// System call connects socket refered by the file descriptor sockfd to
 	// specified address.
-	connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-
-	while (1)
+	status = connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+	if (status < 0)
 	{
-		bzero(sendline, 100);
-		bzero(recvline, 100);
-		fgets(sendline, 100, stdin);
-
-		write(sockfd, sendline, strlen(sendline)+1);
-		read(sockfd, recvline, 100);
-		printf("recv - %s\n", recvline);
+		getError(errno, errmsg);
+		fprintf(stderr, "Error connecting. %s\n", errmsg);
+		exit(1);
 	}
 
+	/* Server entrypoint */
+	sendString(sockfd);
+
+	shutdown(sockfd, SHUT_RDWR);
 	close(sockfd);
 	exit(0);
 }
