@@ -35,7 +35,7 @@ int main()
 	/* CONFIGURE SERVER */
 	startServer();
 
-	/*	ACCEPT CONNECTIONS */
+	/* ACCEPT CONNECTIONS */
 	while (1)
 	{
 		// System call extracts the 1st connection request on queue of pending
@@ -127,19 +127,19 @@ void startServer()
 	if (p==NULL)
 	{
 		fprintf(stderr, "Error creating or binding address to socket. %s\n", getError(errno));
-       	exit(-1);                                                               
+		exit(-1);                                                               
 	}
 
 	// Free the dynamically allocated linked list res.
 	freeaddrinfo(res);
 
-    // Listen for connections on a socket.                                      
-    // Mark the socket lsiten_fd as a passive socket (accept incoming 
+	// Listen for connections on a socket.
+	// Mark the socket lsiten_fd as a passive socket (accept incoming 
 	// connection requests).                                                           
-    status = listen(listenfd, CONNBACKLOG);                                   
-    if (status < 0)                                                             
-    {                                                                           
-        fprintf(stderr, "Error while marking listenfd as passive socket. %s\n", getError(errno));
-        exit(-1);                                                               
-    }
+	status = listen(listenfd, CONNBACKLOG);
+	if (status < 0)
+	{
+		fprintf(stderr, "Error while marking listenfd as passive socket. %s\n", getError(errno));
+		exit(-1);
+	}
 }

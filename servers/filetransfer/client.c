@@ -15,8 +15,8 @@
 int main(int argc, char **argv)
 {
 	int sockfd;
-	char sendline[100]; //*sendline = (char *)malloc(BUFF_SIZE);      /* Allocate 1MB .*/
-	char recvline[100]; //*recvline = (char *)malloc(BUFF_SIZE);      /* Allocate 1MB .*/
+	char sendline[100]; 
+	char recvline[100];
 	struct sockaddr_in servaddr;
 
 	bzero(&servaddr, sizeof(servaddr));                                        
@@ -42,7 +42,5 @@ int main(int argc, char **argv)
 	}
 
 	close(sockfd);
-	free(sendline);
-	free(recvline);
 	exit(0);
 }
