@@ -109,6 +109,7 @@ void serverSendFile(int sockfd, const char* filename)
 		fprintf(stderr, "error sending filename to client\n");
 	// conventional 32bit call
 	long size = s.st_size;
+	printf("file size: %ld\n", size);
 	long tmpSize = htonl(size);
 	//uint64_t size = (uint64_t)s.st_size;
 	//uint64_t tmpSize = htobe64(s.st_size);
