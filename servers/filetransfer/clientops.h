@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <openssl/md5.h>
+#include "tcputilities.h"
 
 #if defined(__linux__)                                                          
 #   include <endian.h>                                                          
@@ -77,7 +78,7 @@ int readFile(int sockfd, void *buf, int len)
 		}
 		if (n == 0)
 		{
-			fprintf(stdout, "socket disconnected\n");
+			//fprintf(stdout, "socket disconnected\n");
 			return 0;
 		}
 		pbuf += n;
@@ -105,48 +106,55 @@ void recvFile(int sockfd)
         fprintf(stderr, "Error opening log file\n");                            
         return;                                                                 
     }
-	
-	// File transfered.
-	n = readFile(sockfd, buf, FNAMESIZE);
-	FILE *file = fopen(buf, "wb");                                       
-    if (file == NULL)                                                           
-	{                                                                           
-		fprintf(stderr, "Error opening file\n");                                
-		return;                                                                 
-	}
-	fprintf(logFile, "%s ", buf);
 
-	// conventional 32bit call
-	// long size = 0;
-	int printflag = 0; 
-	uint64_t size = 0;
-	n = readFile(sockfd, &size, sizeof(size));
-	if (n>0)
+	int serverStatus;
+	while ((serverStatus = checkSocket(sockfd)) == 0)
 	{
-		// Conventional 32bit call 
-		//size = ntohl(size);
-		size = be64toh(size);
-		if (printflag==0)
-			fprintf(logFile, "%ld ", size);
-		printflag = 1;
-
-		MD5_Init(&mdContext);
-		while (size > 0)
-		{
-			n = readFile(sockfd, buf, MIN(sizeof(buf), size));
-			if (n < 1)
-				break;
-			MD5_Update(&mdContext, buf, n);
-			if (writeFile(file, buf, n) == -1)
-				break;
+		// File transfered.
+		n = readFile(sockfd, buf, FNAMESIZE);
+		printf("%d\n", n);
+		if (n==0)
+			break;
+		FILE *file = fopen(buf, "wb");                                       
+    	if (file == NULL)                                                           
+		{                                                                           
+			fprintf(stderr, "Error opening file\n");                                
+			return;                                                                 
 		}
-		MD5_Final(checksum, &mdContext);
-		int i;
-		for (i=0; i<MD5_DIGEST_LENGTH; i++)
-			fprintf(logFile, "%02x", checksum[i]);
-		fprintf(logFile, "\n");
+		fprintf(logFile, "%s ", buf);
+
+		// conventional 32bit call
+		// long size = 0;
+		int printflag = 0; 
+		uint64_t size = 0;
+		n = readFile(sockfd, &size, sizeof(size));
+		if (n>0)
+		{
+			// Conventional 32bit call 
+			//size = ntohl(size);
+			size = be64toh(size);
+			if (printflag==0)
+				fprintf(logFile, "%ld ", size);
+			printflag = 1;
+
+			MD5_Init(&mdContext);
+			while (size > 0)
+			{
+				n = readFile(sockfd, buf, MIN(sizeof(buf), size));
+				if (n < 1)
+					break;
+				MD5_Update(&mdContext, buf, n);
+				if (writeFile(file, buf, n) == -1)
+					break;
+			}
+			MD5_Final(checksum, &mdContext);
+			int i;
+			for (i=0; i<MD5_DIGEST_LENGTH; i++)
+				fprintf(logFile, "%02x", checksum[i]);
+			fprintf(logFile, "\n");
+		}
+		fclose(file);
 	}
-	fclose(file);
 	fclose(logFile);
 }
 

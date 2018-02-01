@@ -86,7 +86,7 @@ int main()
 		else 
 		{
 			int i;
-			for (i=0; i<1; i++)
+			for (i=0; i<2; i++)
 				serverSendFile(clients[slot], filenames[i]);
 		}
 		closeSocket(clients[slot]);
