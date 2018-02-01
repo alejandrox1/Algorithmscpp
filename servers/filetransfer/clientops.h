@@ -102,18 +102,18 @@ void recvFile(int sockfd)
 	}
 	
 	// conventional 32bit call
-	 long size = 0;
-	 int p = 0; 
-	//uint64_t size = 0;
+	//long size = 0;
+	int p = 0; 
+	uint64_t size = 0;
 	n = readFile(sockfd, &size, sizeof(size));
 	if (n>0)
 	{
 		// Conventional 32bit call 
-		size = ntohl(size);
+		//size = ntohl(size);
+		size = be64toh(size);
 		if (p==0)
 			printf("file size: %ld\n", size);
 		p = 1;
-		//size = be64toh(size);
 		while (size > 0)
 		{
 			n = readFile(sockfd, buf, MIN(sizeof(buf), size));
