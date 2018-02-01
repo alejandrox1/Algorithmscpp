@@ -13,9 +13,9 @@
 #define FNAMESIZE 10 
 
 
-// parseExt is a helper func for scandir, used to get all files with an ".out"
-// extension.
-static int parseExt(const struct dirent *dir)
+// parseExtOUTFiles is a helper func for scandir, used to get all files with 
+// an ".out" extension.
+static int parseExtOUUTFiles(const struct dirent *dir)
 {
 	if (!dir)
 		return 0;
@@ -36,7 +36,7 @@ void listFiles(char filenames[NFILES][FNAMESIZE])
 {
 	char errmsg[ERRMSG];
 	struct dirent **namelist;
-	int n = scandir(".", &namelist, parseExt, alphasort);
+	int n = scandir(".", &namelist, parseExtOUTFiles, alphasort);
 	if (n < 0)
 	{
 		getError(n, errmsg);                                               
