@@ -9,7 +9,7 @@
 
 #define BUFFSIZE 1024
 
-
+// sendString will send input from stdin to server.
 void sendString(int sockfd)                                                
 {                                                                               
     char sendline[BUFFSIZE];                                                         
@@ -28,33 +28,33 @@ void sendString(int sockfd)
     }                           
 } 
 
-int writeFile(FILE *file, const void *buff, int len)
-{
-	const char *pbuff = (const char *)buff;
 
+// writeFile will take the contents from buf and write them to a file.
+int writeFile(FILE *file, const void *buf, int len)
+{
+	const char *pbuf = (const char *)buf;
 	while (len > 0)
 	{
-		int written = fwrite(pbuff, 1, len, file);
+		int written = fwrite(pbuf, 1, len, file);
 		if (written < 1)
 		{
 			fprintf(stderr, "cannot write to file\n");
 			return -1;
 		}
-		pbuff += written;
+		pbuf += written;
 		len -= written;
 	}
 	return 0;
 }
 
-
-int readFile(int sockfd, void *buff, int len)
+// readFile will connect to a socket and save contents to buf.
+int readFile(int sockfd, void *buf, int len)
 {
-	char *pbuff = (char *)buff;
+	char *pbuf = (char *)buf;
 	int total = 0;
-
 	while (len > 0)
 	{
-		int n = recv(sockfd, pbuff, len, 0);
+		int n = recv(sockfd, pbuf, len, 0);
 		if (n < 0)
 		{
 			fprintf(stderr, "cannot read from socket\n");
@@ -62,30 +62,33 @@ int readFile(int sockfd, void *buff, int len)
 		}
 		if (n == 0)
 		{
-			fprintf(stderr, "socket disconnected");
+			fprintf(stderr, "socket disconnected\n");
 			return 0;
 		}
-
-		pbuff += n;
+		pbuf += n;
 		len -= n;
 		total += n;
 	}
 	return total;
 }
 
+// recvFile uses a socket to connect to a server, recive file data and store
+// it. It utilizes the functions readFile and writeFile.
 void recvFile(int sockfd)
 {
 	char buff[BUFFSIZE];
-	FILE *file = fopen("recv.txt", "r");
+	FILE *file = fopen("recv.txt", "wb");
 	if (file == NULL)
 	{
-		fprintf(stderr, "Error opening file");
+		fprintf(stderr, "Error opening file\n");
 		return;                                                                 
 	}
 
 	int n;
 	long size = 0;
-	if (readFile(sockfd, &size, sizeof(size)) == 1)
+	n = readFile(sockfd, &size, sizeof(size));
+	printf("%d bytes recv: %ld\n", n, size);
+	if (n>0)
 	{
 		size = ntohl(size);
 		while (size > 0)
@@ -93,6 +96,7 @@ void recvFile(int sockfd)
 			n = readFile(sockfd, buff, MIN(sizeof(buff), size));
 			if (n < 1)
 				break;
+			fprintf(stdout, "client recv: '%s'\n", buff);
 			if (writeFile(file, buff, n) == -1)
 				break;
 		}

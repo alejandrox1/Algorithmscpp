@@ -9,7 +9,8 @@
 #define BUFFSIZE 1024
 
 
-
+// echoClient is an operation that will respond to a client by echoing back its
+// message.
 void echoClient(int *sockfd)
 {
 	char buff[BUFFSIZE];
@@ -35,24 +36,30 @@ void echoClient(int *sockfd)
 	}
 }
 
-int sendFile(int sockfd, const void * buff, int len)
-{
-	const char *pbuff = (const char *)buff;
 
+// sendFile sends contents from buf to socket.
+int sendFile(int sockfd, const void * buf, int len)
+{
+	const char *pbuf = (const char *)buf;
 	while (len > 0)
 	{
-		int sent = send(sockfd, pbuff, len, 0);
+		int sent = send(sockfd, pbuf, len, 0);
 		if (sent < 1)
 		{
 			fprintf(stderr, "cannot write to socket");
 			return -1;
 		}
-		pbuff += sent;
+
+		// server.
+		fprintf(stdout, "sent %d: '%s' with len: %d\n", sent, pbuf, len);
+		pbuf += sent;
 		len -= sent;
 	}
 	return 0;
 }
 
+// serverSendFile will send the contents of a file over to a socket.
+// It utilizes the function sendFile.
 void serverSendFile(int sockfd)
 {
 	const char* filename = "sent.txt";
@@ -74,6 +81,7 @@ void serverSendFile(int sockfd)
 
 	long size = s.st_size;
 	long tmpSize = htonl(size);
+	// Send file size.
 	if (sendFile(sockfd, &tmpSize, sizeof(tmpSize)) == 0)
 	{
 		while (size > 0)
@@ -84,7 +92,8 @@ void serverSendFile(int sockfd)
 				fprintf(stderr, "cannot read from file\n");
 				break;
 			}
-
+			
+			fprintf(stdout, "sending: '%s'\n", buff);
 			if (sendFile(sockfd, buff, n) < 0)
 				break;
 

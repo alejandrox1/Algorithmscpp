@@ -45,7 +45,8 @@ int main(int argc, char **argv)
 	}
 
 	/* Server entrypoint */
-	sendString(sockfd);
+	//sendString(sockfd);
+	recvFile(sockfd);
 
 	shutdown(sockfd, SHUT_RDWR);
 	close(sockfd);

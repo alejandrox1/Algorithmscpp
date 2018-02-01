@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include "utilities.h"
-#include "operations.h"
+#include "serverops.h"
 
 
 #define CONNPORT "22000"
@@ -63,7 +63,8 @@ int main()
 		// Process client reuests.
 		else 
 		{
-			echoClient(&clients[slot]);
+			// echoClient(&clients[slot]);
+			serverSendFile(clients[slot]);
 		}
 		closeSocket(clients[slot]);
 		clients[slot] = -1;
