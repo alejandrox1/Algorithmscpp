@@ -1,10 +1,8 @@
 #!/bin/bash
 
 clear
-sudo fuser -n tcp -k 22000
-sleep 10
-
-set -x
+#sudo fuser -n tcp -k 22000
+#sleep 10
 
 SEXEC=fserver
 CEXEC=fclient
@@ -22,6 +20,7 @@ make clean && make server && make client && \
 	mv $CEXEC ${CDIR} && \
 	mv $SEXEC ${SDIR}                                      
 		    
+set -x
 
 # Run server
 cd ${CWD}/${SDIR}
@@ -40,10 +39,11 @@ ls -l
 echo
 ls -lh
 
+set +x
 # Compare transfered files with the originals
-for i in $(ls ${CDIR}/*.out | xargs -n 1 basename); 
+for i in $(ls ${CWD}/${CDIR}/*.out | xargs -n 1 basename); 
 do
-	diff <(xxd ${CDIR}/${i}) <(xxd ${SDIR}/${i})
+	diff <(xxd ${CWD}/${CDIR}/${i}) <(xxd ${CWD}/${SDIR}/${i})
 done
 
 cat ${CWD}/${CDIR}/client.log
