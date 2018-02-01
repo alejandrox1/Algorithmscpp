@@ -5,8 +5,56 @@
 #include <stdlib.h>                                                             
 #include <unistd.h>                                                             
 #include <ctype.h>
+#include <dirent.h>
 #include <string.h>
-                          
+#include "errutilities.h"
+
+#define NFILES 10
+#define FNAMESIZE 10 
+
+
+// parseExt is a helper func for scandir, used to get all files with an ".out"
+// extension.
+static int parseExt(const struct dirent *dir)
+{
+	if (!dir)
+		return 0;
+	if (dir->d_type == DT_REG)
+	{
+		char *ext = strrchr(dir->d_name, '.');
+		if ((!ext) || (ext == dir->d_name))
+			return 0;
+		else
+			if (strcmp(ext, ".out") == 0)
+				return 1;
+	}
+	return 0;
+}
+
+
+void listFiles(char filenames[NFILES][FNAMESIZE])
+{
+	char errmsg[ERRMSG];
+	struct dirent **namelist;
+	int n = scandir(".", &namelist, parseExt, alphasort);
+	if (n < 0)
+	{
+		getError(n, errmsg);                                               
+	    fprintf(stderr, "scandir error: %s\n", errmsg);
+		return;
+	}
+	else
+	{
+		while (n--) 
+		{
+			strcpy(filenames[n], namelist[n]->d_name);
+			//printf("%s\n", namelist[n]->d_name);
+			free(namelist[n]);
+		}
+		free(namelist);
+	}
+}
+
 
 // generateRandomStr will generate a seqLen filename into name for a given file
 // extension type.

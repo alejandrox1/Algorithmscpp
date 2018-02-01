@@ -37,13 +37,13 @@ void echoClient(int *sockfd)
 	}
 }
 
-void createFiles()
+void createNFiles(int n)
 {
 	int i;
 	char name[FNAMESIZE],                                                       
          ext[] = ".out";                                                        
 	
-	for (i=0; i<10; i++)
+	for (i=0; i<n; i++)
 	{
 		bzero(name, sizeof(name));
 		generateRandomStr(name, ext, FNAMESIZE-sizeof(ext)); 
@@ -73,9 +73,8 @@ int sendFile(int sockfd, const void * buf, int len)
 
 // serverSendFile will send the contents of a file over to a socket.
 // It utilizes the function sendFile.
-void serverSendFile(int sockfd)
+void serverSendFile(int sockfd, const char* filename)
 {
-	const char* filename = "sent.txt";
 	char buff[BUFFSIZE];
 	struct stat s;
 

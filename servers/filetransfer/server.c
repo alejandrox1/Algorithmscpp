@@ -17,6 +17,8 @@
 #define CONNMAX 1000
 #define CONNBACKLOG 1000
 #define ERRMSG 1024
+#define NFILES 10
+
 
 int listenfd;
 int clients[CONNMAX];
@@ -38,7 +40,11 @@ int main()
 		clients[i] = -1;
 
 	/* Start creating files. */
-	createFiles();
+	char filenames[NFILES][FNAMESIZE];
+	createNFiles(NFILES);
+	listFiles(filenames);
+	for (i=0; i<NFILES; i++)
+		printf("- %s\n", filenames[i]);
 
 	/* CONFIGURE SERVER */
 	startServer();
@@ -72,7 +78,7 @@ int main()
 		else 
 		{
 			// echoClient(&clients[slot]);
-			serverSendFile(clients[slot]);
+			serverSendFile(clients[slot], filenames[0]);
 		}
 		closeSocket(clients[slot]);
 		clients[slot] = -1;
