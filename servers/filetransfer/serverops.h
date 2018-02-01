@@ -4,7 +4,7 @@
 #include <arpa/inet.h>
 #include <sys/stat.h>
 #include <stdio.h>
-#include "utilities.h"
+#include "errutilities.h"
 
 #define BUFFSIZE 1024
 

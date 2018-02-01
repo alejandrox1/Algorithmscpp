@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "utilities.h"
+#include "errutilities.h"
+#include "tcputilities.h"
 #include "clientops.h"
 
 
@@ -47,8 +48,7 @@ int main(int argc, char **argv)
 	/* Server entrypoint */
 	//sendString(sockfd);
 	recvFile(sockfd);
-
-	shutdown(sockfd, SHUT_RDWR);
-	close(sockfd);
+	
+	closeSocket(sockfd);
 	exit(0);
 }

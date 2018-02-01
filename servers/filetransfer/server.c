@@ -6,7 +6,8 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
-#include "utilities.h"
+#include "errutilities.h"
+#include "tcputilities.h"
 #include "serverops.h"
 
 

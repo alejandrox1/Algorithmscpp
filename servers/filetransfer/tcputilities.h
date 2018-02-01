@@ -1,5 +1,5 @@
-#ifndef __UTILITIES_H__
-#define __UTILITIES_H__
+#ifndef __TCPUTILITIES_H__
+#define __TCPUTILITIES_H__
 
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -9,15 +9,6 @@
 #include <string.h>
 
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
-#define ERRMSG 1024
-
-
-// getError returns error message.
-void getError(int n, char* errmsg)
-{
-	// TODO: better error handling here... 
-	strerror_r(n, errmsg, ERRMSG);
-}
 
 
 // checkSocket is used to check whether a client is still connected and to
@@ -97,4 +88,4 @@ void closeSocket(int commfd)
 
 
 
-#endif // __UTILITIES_H__
+#endif // __TCPUTILITIES_H__
