@@ -37,6 +37,9 @@ int main()
 	for (i=0; i<CONNMAX; i++)
 		clients[i] = -1;
 
+	/* Start creating files. */
+	createFiles();
+
 	/* CONFIGURE SERVER */
 	startServer();
 
@@ -68,7 +71,6 @@ int main()
 		// Process client reuests.
 		else 
 		{
-			createFiles();
 			// echoClient(&clients[slot]);
 			serverSendFile(clients[slot]);
 		}
