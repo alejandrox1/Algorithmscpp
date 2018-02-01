@@ -17,3 +17,5 @@ do
 	diff <(xxd ${i}) <(xxd ${CMPDIR}/${i})
 done
 
+cat client.log
+cat ${CMPDIR}/server.log
