@@ -91,11 +91,22 @@ int readFile(int sockfd, void *buf, int len)
 // it. It utilizes the functions readFile and writeFile.
 void recvFile(int sockfd)
 {
+	FILE *logFile;
+	const char lofFileName[] = "client.log";
 	unsigned char checksum[MD5_DIGEST_LENGTH];                                  
 	MD5_CTX mdContext;
 	int n;
 	char buf[BUFFSIZE];
+
+	// Log file.                                                                
+    logFile = fopen(lofFileName, "a");                                          
+    if (logFile == NULL)                                                        
+    {                                                                           
+        fprintf(stderr, "Error opening log file\n");                            
+        return;                                                                 
+    }
 	
+	// File transfered.
 	n = readFile(sockfd, buf, FNAMESIZE);
 	FILE *file = fopen(buf, "wb");                                       
     if (file == NULL)                                                           
@@ -103,10 +114,11 @@ void recvFile(int sockfd)
 		fprintf(stderr, "Error opening file\n");                                
 		return;                                                                 
 	}
-	
+	fprintf(logFile, "%s ", buf);
+
 	// conventional 32bit call
 	// long size = 0;
-	int p = 0; 
+	int printflag = 0; 
 	uint64_t size = 0;
 	n = readFile(sockfd, &size, sizeof(size));
 	if (n>0)
@@ -114,9 +126,9 @@ void recvFile(int sockfd)
 		// Conventional 32bit call 
 		//size = ntohl(size);
 		size = be64toh(size);
-		if (p==0)
-			printf("file size: %ld\n", size);
-		p = 1;
+		if (printflag==0)
+			fprintf(logFile, "%ld ", size);
+		printflag = 1;
 
 		MD5_Init(&mdContext);
 		while (size > 0)
@@ -130,12 +142,12 @@ void recvFile(int sockfd)
 		}
 		MD5_Final(checksum, &mdContext);
 		int i;
-		printf("checksum: ");
 		for (i=0; i<MD5_DIGEST_LENGTH; i++)
-			printf("%02x", checksum[i]);
-		printf("\n");
+			fprintf(logFile, "%02x", checksum[i]);
+		fprintf(logFile, "\n");
 	}
 	fclose(file);
+	fclose(logFile);
 }
 
 #endif // __CLIENTOPS_H__
