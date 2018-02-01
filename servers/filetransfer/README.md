@@ -26,4 +26,6 @@
 # Notes
 * [Functionality to read large files (> 3 GB) in chunks](https://codereview.stackexchange.com/questions/28039/functionality-to-read-large-files-3-gb-in-chunks)
 
+* [64 bit ntohl() in C++?](https://stackoverflow.com/questions/809902/64-bit-ntohl-in-c)
+
 * [How to calculate the MD5 hash of a large file in C?](https://stackoverflow.com/questions/10324611/how-to-calculate-the-md5-hash-of-a-large-file-in-c)
