@@ -1,5 +1,4 @@
 # TO DO:
-* Log files
 * Concurrency (client/server)
 
 # Cool things to do
