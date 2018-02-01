@@ -1,8 +1,8 @@
 client:
-	gcc -Wall client.c -o fclient -lssl -lcrypto
+	gcc -g -Wall client.c -o fclient -lssl -lcrypto
 
 server: 
-	gcc -Wall server.c -o fserver -lssl -lcrypto
+	gcc -g -Wall server.c -o fserver -lssl -lcrypto
 
 clean:
 	rm -rf fserver fclient
