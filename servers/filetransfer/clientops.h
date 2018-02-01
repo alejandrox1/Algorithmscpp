@@ -110,11 +110,12 @@ void recvFile(int sockfd)
 	int serverStatus;
 	while ((serverStatus = checkSocket(sockfd)) == 0)
 	{
+		printf("***\n");
+		bzero(buf, BUFFSIZE); 
 		// File transfered.
 		n = readFile(sockfd, buf, FNAMESIZE);
-		printf("%d\n", n);
-		if (n==0)
-			break;
+		//if (n==0)
+		//	break;
 		FILE *file = fopen(buf, "wb");                                       
     	if (file == NULL)                                                           
 		{                                                                           
@@ -122,6 +123,7 @@ void recvFile(int sockfd)
 			return;                                                                 
 		}
 		fprintf(logFile, "%s ", buf);
+		printf("%s ", buf);
 
 		// conventional 32bit call
 		// long size = 0;
@@ -134,8 +136,11 @@ void recvFile(int sockfd)
 			//size = ntohl(size);
 			size = be64toh(size);
 			if (printflag==0)
+			{
 				fprintf(logFile, "%ld ", size);
-			printflag = 1;
+				printf("%ld ", size);
+				printflag = 1;
+			}
 
 			MD5_Init(&mdContext);
 			while (size > 0)
@@ -146,6 +151,7 @@ void recvFile(int sockfd)
 				MD5_Update(&mdContext, buf, n);
 				if (writeFile(file, buf, n) == -1)
 					break;
+				size -= n;
 			}
 			MD5_Final(checksum, &mdContext);
 			int i;
