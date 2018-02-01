@@ -32,9 +32,9 @@ int checkSocket(int socketfd)
 		errno = err;
 		getError(err, errmsg);
 		fprintf(stdout, "socket error: %s\n", errmsg);
-		return 0;
+		return -1;
 	}
-	return 1;
+	return 0;
 }
 
 // getClientIP gets the IP address of client connection to server.

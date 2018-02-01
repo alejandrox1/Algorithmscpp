@@ -39,7 +39,7 @@ void echoClient(int *sockfd)
 	while (1)                                                           
 	{                                                                   
 		client_status = checkSocket(commfd);                     
-		if (client_status < 1)
+		if (client_status != 0)
 		{
 			fprintf(stdout, "Connection %s broken\n", ip);
 			break;     
