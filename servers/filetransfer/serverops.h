@@ -105,13 +105,13 @@ void serverSendFile(int sockfd, const char* filename)
         return;                                                                 
     }	
 
-
-	/* conventional 32bit call
-	 * long size = s.st_size;
-	 * long tmpSize = htonl(size);
-	 */
-	uint64_t size = (uint64_t)s.st_size;
-	uint64_t tmpSize = htobe64(s.st_size);
+	if (sendFile(sockfd, filename, strlen(filename)+1) != 0)
+		fprintf(stderr, "error sending filename to client\n");
+	// conventional 32bit call
+	long size = s.st_size;
+	long tmpSize = htonl(size);
+	//uint64_t size = (uint64_t)s.st_size;
+	//uint64_t tmpSize = htobe64(s.st_size);
 	// Send file size.
 	if (sendFile(sockfd, &tmpSize, sizeof(tmpSize)) == 0)
 	{

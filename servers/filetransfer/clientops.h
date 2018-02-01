@@ -20,6 +20,7 @@
 
 
 #define BUFFSIZE 1024
+#define FNAMESIZE 10
 
 
 // sendString will send input from stdin to server.
@@ -75,7 +76,7 @@ int readFile(int sockfd, void *buf, int len)
 		}
 		if (n == 0)
 		{
-			fprintf(stderr, "socket disconnected\n");
+			fprintf(stdout, "socket disconnected\n");
 			return 0;
 		}
 		pbuf += n;
@@ -89,33 +90,32 @@ int readFile(int sockfd, void *buf, int len)
 // it. It utilizes the functions readFile and writeFile.
 void recvFile(int sockfd)
 {
-	char buff[BUFFSIZE];
-	FILE *file = fopen("recv.txt", "wb");
-	if (file == NULL)
-	{
-		fprintf(stderr, "Error opening file\n");
+	int n;
+	char buf[BUFFSIZE];
+	
+	n = readFile(sockfd, buf, FNAMESIZE);
+	FILE *file = fopen(buf, "wb");                                       
+    if (file == NULL)                                                           
+	{                                                                           
+		fprintf(stderr, "Error opening file\n");                                
 		return;                                                                 
 	}
-
-	int n;
-	/* conventional 32bit call
-	 * long size = 0;
-	 */
-	uint64_t size = 0;
+	
+	// conventional 32bit call
+	 long size = 0;
+	//uint64_t size = 0;
 	n = readFile(sockfd, &size, sizeof(size));
-	printf("%d bytes recv: %ld\n", n, size);
 	if (n>0)
 	{
-		/* Conventional 32bit call 
-		 * size = ntohl(size);
-		 */
+		// Conventional 32bit call 
+		size = ntohl(size);
 		size = be64toh(size);
 		while (size > 0)
 		{
-			n = readFile(sockfd, buff, MIN(sizeof(buff), size));
+			n = readFile(sockfd, buf, MIN(sizeof(buf), size));
 			if (n < 1)
 				break;
-			if (writeFile(file, buff, n) == -1)
+			if (writeFile(file, buf, n) == -1)
 				break;
 		}
 	}
