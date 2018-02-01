@@ -9,13 +9,13 @@
 #include <string.h>
 #include "errutilities.h"
 
-#define NFILES 10
+#define NFILES 50
 #define FNAMESIZE 10 
 
 
 // parseExtOUTFiles is a helper func for scandir, used to get all files with 
 // an ".out" extension.
-static int parseExtOUUTFiles(const struct dirent *dir)
+static int parseExtOUTFiles(const struct dirent *dir)
 {
 	if (!dir)
 		return 0;
