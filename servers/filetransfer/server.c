@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include "errutilities.h"
+#include "fileutilities.h"
 #include "tcputilities.h"
 #include "serverops.h"
 
@@ -64,6 +65,7 @@ int main()
 		// Process client reuests.
 		else 
 		{
+			createFiles();
 			// echoClient(&clients[slot]);
 			serverSendFile(clients[slot]);
 		}

@@ -96,7 +96,6 @@ void recvFile(int sockfd)
 			n = readFile(sockfd, buff, MIN(sizeof(buff), size));
 			if (n < 1)
 				break;
-			fprintf(stdout, "client recv: '%s'\n", buff);
 			if (writeFile(file, buff, n) == -1)
 				break;
 		}

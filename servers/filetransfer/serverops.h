@@ -7,7 +7,7 @@
 #include "errutilities.h"
 
 #define BUFFSIZE 1024
-
+#define FNAMESIZE 10
 
 // echoClient is an operation that will respond to a client by echoing back its
 // message.
@@ -37,6 +37,17 @@ void echoClient(int *sockfd)
 }
 
 
+void createFiles()
+{
+	char name[FNAMESIZE];
+	char ext[] = ".out";
+	
+	bzero(name, sizeof(name));
+	generateRandomStr(name, ext, FNAMESIZE-sizeof(ext));
+
+	printf("filename generated: %s\n", name);
+}
+
 // sendFile sends contents from buf to socket.
 int sendFile(int sockfd, const void * buf, int len)
 {
@@ -50,8 +61,6 @@ int sendFile(int sockfd, const void * buf, int len)
 			return -1;
 		}
 
-		// server.
-		fprintf(stdout, "sent %d: '%s' with len: %d\n", sent, pbuf, len);
 		pbuf += sent;
 		len -= sent;
 	}
@@ -93,7 +102,6 @@ void serverSendFile(int sockfd)
 				break;
 			}
 			
-			fprintf(stdout, "sending: '%s'\n", buff);
 			if (sendFile(sockfd, buff, n) < 0)
 				break;
 
