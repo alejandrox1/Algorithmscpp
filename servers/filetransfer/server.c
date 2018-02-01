@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 #include <unistd.h>
 #include "errutilities.h"
 #include "fileutilities.h"
@@ -25,6 +26,8 @@ void startServer();
 
 int main()
 {
+	srand(time(NULL));
+
 	char errmsg[ERRMSG];
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;

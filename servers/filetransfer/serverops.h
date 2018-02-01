@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "errutilities.h"
 
 #define BUFFSIZE 1024
@@ -36,17 +37,20 @@ void echoClient(int *sockfd)
 	}
 }
 
-
 void createFiles()
 {
-	char name[FNAMESIZE];
-	char ext[] = ".out";
+	int i;
+	char name[FNAMESIZE],                                                       
+         ext[] = ".out";                                                        
 	
-	bzero(name, sizeof(name));
-	generateRandomStr(name, ext, FNAMESIZE-sizeof(ext));
-
-	printf("filename generated: %s\n", name);
+	for (i=0; i<10; i++)
+	{
+		bzero(name, sizeof(name));
+		generateRandomStr(name, ext, FNAMESIZE-sizeof(ext)); 
+		createDevUrandomFile(name);     
+	}
 }
+
 
 // sendFile sends contents from buf to socket.
 int sendFile(int sockfd, const void * buf, int len)

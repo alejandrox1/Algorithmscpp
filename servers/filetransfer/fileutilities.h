@@ -6,13 +6,13 @@
 #include <unistd.h>                                                             
 #include <ctype.h>
 #include <string.h>
-#include <time.h>
-                           
+                          
+
 // generateRandomStr will generate a seqLen filename into name for a given file
 // extension type.
 void generateRandomStr(char name[], char *ext, int seqLen)
 {
-	srand(time(NULL));
+	//srand(time(NULL));
 
 	int n, i=0;
 	while (i < seqLen)
@@ -33,7 +33,7 @@ void generateRandomStr(char name[], char *ext, int seqLen)
 // ranging from 1MB to 10MB.
 void createDevUrandomFile(const char *filename)                                                                      
 {                                                                               
-    srand(time(NULL));    
+    //srand(time(NULL));    
     int factor = rand()%10 + 1;
                                                 
     char buf[1024*1024];                                                        
