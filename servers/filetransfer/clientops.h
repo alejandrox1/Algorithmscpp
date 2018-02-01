@@ -4,10 +4,23 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <unistd.h>
+
+#if defined(__linux__)                                                          
+#   include <endian.h>                                                          
+#elif defined(__FreeBSD__) || defined(__NetBSD__)                               
+#   include <sys/endian.h>                                                      
+#elif defined(__OpenBSD__)                                                      
+#   include <sys/types.h>                                                       
+#   define be16toh(x) betoh16(x)                                                
+#   define be32toh(x) betoh32(x)                                                
+#   define be64toh(x) betoh64(x)                                                
+#endif
 
 
 #define BUFFSIZE 1024
+
 
 // sendString will send input from stdin to server.
 void sendString(int sockfd)                                                
@@ -85,12 +98,18 @@ void recvFile(int sockfd)
 	}
 
 	int n;
-	long size = 0;
+	/* conventional 32bit call
+	 * long size = 0;
+	 */
+	uint64_t size = 0;
 	n = readFile(sockfd, &size, sizeof(size));
 	printf("%d bytes recv: %ld\n", n, size);
 	if (n>0)
 	{
-		size = ntohl(size);
+		/* Conventional 32bit call 
+		 * size = ntohl(size);
+		 */
+		size = be64toh(size);
 		while (size > 0)
 		{
 			n = readFile(sockfd, buff, MIN(sizeof(buff), size));

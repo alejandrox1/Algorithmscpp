@@ -4,11 +4,25 @@
 #include <arpa/inet.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <unistd.h>
 #include "errutilities.h"
 
+#if defined(__linux__)                                                          
+#   include <endian.h>                                                          
+#elif defined(__FreeBSD__) || defined(__NetBSD__)                               
+#   include <sys/endian.h>                                                      
+#elif defined(__OpenBSD__)                                                      
+#   include <sys/types.h>                                                       
+#   define be16toh(x) betoh16(x)                                                
+#   define be32toh(x) betoh32(x)                                                
+#   define be64toh(x) betoh64(x)                                                
+#endif
+
+
 #define BUFFSIZE 1024
 #define FNAMESIZE 10
+
 
 // echoClient is an operation that will respond to a client by echoing back its
 // message.
@@ -91,8 +105,13 @@ void serverSendFile(int sockfd, const char* filename)
         return;                                                                 
     }	
 
-	long size = s.st_size;
-	long tmpSize = htonl(size);
+
+	/* conventional 32bit call
+	 * long size = s.st_size;
+	 * long tmpSize = htonl(size);
+	 */
+	uint64_t size = (uint64_t)s.st_size;
+	uint64_t tmpSize = htobe64(s.st_size);
 	// Send file size.
 	if (sendFile(sockfd, &tmpSize, sizeof(tmpSize)) == 0)
 	{
