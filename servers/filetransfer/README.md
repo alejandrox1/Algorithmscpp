@@ -2,6 +2,10 @@
 * Log files
 * Concurrency (client/server)
 
+# Cool things to do
+* Make sure files created are unique (set).
+* Optimize IO ops.
+
 # Refs
 [C- Socket : Programming a Client/Server-Application to send a file](https://stackoverflow.com/questions/9875735/c-socket-programming-a-client-server-application-to-send-a-file)
 
