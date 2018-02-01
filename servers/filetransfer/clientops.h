@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <openssl/md5.h>
 
 #if defined(__linux__)                                                          
 #   include <endian.h>                                                          
@@ -90,6 +91,8 @@ int readFile(int sockfd, void *buf, int len)
 // it. It utilizes the functions readFile and writeFile.
 void recvFile(int sockfd)
 {
+	unsigned char checksum[MD5_DIGEST_LENGTH];                                  
+	MD5_CTX mdContext;
 	int n;
 	char buf[BUFFSIZE];
 	
@@ -102,7 +105,7 @@ void recvFile(int sockfd)
 	}
 	
 	// conventional 32bit call
-	//long size = 0;
+	// long size = 0;
 	int p = 0; 
 	uint64_t size = 0;
 	n = readFile(sockfd, &size, sizeof(size));
@@ -114,14 +117,23 @@ void recvFile(int sockfd)
 		if (p==0)
 			printf("file size: %ld\n", size);
 		p = 1;
+
+		MD5_Init(&mdContext);
 		while (size > 0)
 		{
 			n = readFile(sockfd, buf, MIN(sizeof(buf), size));
 			if (n < 1)
 				break;
+			MD5_Update(&mdContext, buf, n);
 			if (writeFile(file, buf, n) == -1)
 				break;
 		}
+		MD5_Final(checksum, &mdContext);
+		int i;
+		printf("checksum: ");
+		for (i=0; i<MD5_DIGEST_LENGTH; i++)
+			printf("%02x", checksum[i]);
+		printf("\n");
 	}
 	fclose(file);
 }

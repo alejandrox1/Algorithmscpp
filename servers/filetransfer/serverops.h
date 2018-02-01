@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <openssl/md5.h>
 #include "errutilities.h"
 
 #if defined(__linux__)                                                          
@@ -89,7 +90,9 @@ int sendFile(int sockfd, const void * buf, int len)
 // It utilizes the function sendFile.
 void serverSendFile(int sockfd, const char* filename)
 {
-	char buff[BUFFSIZE];
+	unsigned char checksum[MD5_DIGEST_LENGTH];
+	MD5_CTX mdContext;
+	char buf[BUFFSIZE];
 	struct stat s;
 
 	if (stat(filename, &s) < 0)
@@ -108,28 +111,35 @@ void serverSendFile(int sockfd, const char* filename)
 	if (sendFile(sockfd, filename, strlen(filename)+1) != 0)
 		fprintf(stderr, "error sending filename to client\n");
 	// conventional 32bit call
-	//long size = s.st_size;
-	//long tmpSize = htonl(size);
+	// long size = s.st_size;
+	// long tmpSize = htonl(size);
 	uint64_t size = (uint64_t)s.st_size;
 	uint64_t tmpSize = htobe64(s.st_size);
 	printf("file size: %ld\n", size);
 	// Send file size.
 	if (sendFile(sockfd, &tmpSize, sizeof(tmpSize)) == 0)
 	{
+		MD5_Init(&mdContext);
 		while (size > 0)
 		{
-			int n = fread(buff, 1, MIN(sizeof(buff), size), file);
+			int n = fread(buf, 1, MIN(sizeof(buf), size), file);
 			if (n < 1)
 			{
 				fprintf(stderr, "cannot read from file\n");
 				break;
 			}
-			
-			if (sendFile(sockfd, buff, n) < 0)
+			MD5_Update(&mdContext, buf, n);
+			if (sendFile(sockfd, buf, n) < 0)
 				break;
 
 			size -= n;
 		}
+		MD5_Final(checksum, &mdContext);
+		int i;
+		printf("checksum: ");
+		for (i=0; i<MD5_DIGEST_LENGTH; i++)
+			printf("%02x", checksum[i]);
+		printf("\n");
 	}
 	fclose(file);
 }
