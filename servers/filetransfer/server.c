@@ -17,7 +17,7 @@
 #define CONNMAX 1000
 #define CONNBACKLOG 1000
 #define ERRMSG 1024
-#define NFILES 10
+#define NFILES 1000
 
 
 int listenfd;
@@ -25,26 +25,34 @@ int clients[CONNMAX];
 
 void startServer();
 
-
-int main()
+void init()
 {
 	srand(time(NULL));
 
+	int i;                                                                      
+	for (i=0; i<CONNMAX; i++)                                                   
+		clients[i] = -1;
+}
+
+int main()
+{
 	char errmsg[ERRMSG];
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	int slot = 0;
 
-	int i;
-	for (i=0; i<CONNMAX; i++)
-		clients[i] = -1;
+	/* SERVER STARTUP */
+	init();
 
-	/* Start creating files. */
+	/* GENERATE FILES */
 	char filenames[NFILES][FNAMESIZE];
+	clock_t t = clock();
 	createNFiles(NFILES);
+	t = clock() - t;
+	fprintf(stdout, "Time taken to create files %f\n", ((double)t)/CLOCKS_PER_SEC);
 	listFiles(filenames);
-	for (i=0; i<NFILES; i++)
-		printf("- %s\n", filenames[i]);
+	//for (i=0; i<NFILES; i++)
+	//	printf("- %s\n", filenames[i]);
 
 	/* CONFIGURE SERVER */
 	startServer();
@@ -77,8 +85,9 @@ int main()
 		// Process client reuests.
 		else 
 		{
-			// echoClient(&clients[slot]);
-			serverSendFile(clients[slot], filenames[0]);
+			int i;
+			for (i=0; i<1; i++)
+				serverSendFile(clients[slot], filenames[i]);
 		}
 		closeSocket(clients[slot]);
 		clients[slot] = -1;

@@ -9,7 +9,7 @@
 #include <string.h>
 #include "errutilities.h"
 
-#define NFILES 50
+#define NFILES 1000
 #define FNAMESIZE 10 
 
 
