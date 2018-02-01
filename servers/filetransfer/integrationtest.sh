@@ -25,7 +25,7 @@ make clean && make server && make client && \
 
 # Run server
 cd ${CWD}/${SDIR}
-nohup ./${SEXEC} & 
+nohup ./${SEXEC} &> /dev/null & 
 SERVPID=$!
 sleep 40
 echo "server started with pid ${SERVPID}" 
