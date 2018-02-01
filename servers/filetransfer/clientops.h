@@ -113,8 +113,8 @@ void recvFile(int sockfd)
 		bzero(buf, BUFFSIZE); 
 		// File transfered.
 		n = readFile(sockfd, buf, FNAMESIZE);
-		//if (n==0)
-		//	break;
+		if (n==0)
+			break;
 		FILE *file = fopen(buf, "wb");                                       
     	if (file == NULL)                                                           
 		{                                                                           
