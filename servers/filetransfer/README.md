@@ -1,6 +1,5 @@
 # TO DO:
-* MD5
-* Large file transfer (> GB)
+* Log files
 * Concurrency (client/server)
 
 # Refs
