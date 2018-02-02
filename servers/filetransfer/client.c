@@ -7,8 +7,9 @@
 #include <string.h>
 #include <unistd.h>
 #include "errutilities.h"
-#include "tcputilities.h"
 #include "clientops.h"
+#include "pthrutils.h"
+#include "tcputilities.h"
 
 
 #define CONN_PORT 22000
@@ -46,9 +47,9 @@ int main(int argc, char **argv)
 	}
 
 	/* Server entrypoint */
-	//sendString(sockfd);
 	recvFile(sockfd);
 	
 	closeSocket(sockfd);
 	exit(0);
 }
+
