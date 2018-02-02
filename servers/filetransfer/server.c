@@ -21,10 +21,19 @@
 #define ERRMSG 1024
 #define NFILES 1000
 
+struct params
+{
+	pthread_mutex_t mutex;                                                      
+	pthread_cond_t done;                                                        
+	int commfd;                                                                      
+};
+
+typedef struct params params_t;
 
 int listenfd;
 char filenames[NFILES][FNAMESIZE];
 void startServer();
+void* handler(void*);
 void init()
 {
 	srand(time(NULL));
@@ -47,9 +56,15 @@ int main()
 	startServer();
 
 	/* ACCEPT CONNECTIONS */
+	int status;
 	char errmsg[ERRMSG];                                                        
 	struct sockaddr_in clientaddr;                                              
 	socklen_t addrlen;
+	pthread_t threadID;                                                         
+    params_t params;
+	pthread_mutex_init (&params.mutex, NULL);                                   
+	pthread_cond_init (&params.done, NULL);
+	pthread_mutex_lock(&params.mutex);
 	while (1)
 	{
 		// System call extracts the 1st connection request on queue of pending
@@ -58,7 +73,7 @@ int main()
 		// socket.
 		addrlen = sizeof(clientaddr);
 		int commfd = accept(listenfd, (struct sockaddr *)&clientaddr, &addrlen);
-			
+		printf("accepted: %d\n", commfd);		
 		// Error accepting connection.
 		if (commfd < 0)
 		{	
@@ -77,15 +92,22 @@ int main()
 		// Process client reuests.
 		else 
 		{
-			int i;
-			for (i=0; i<500; i++)
-				serverSendFile(commfd, filenames[i]);
+			params.commfd = commfd;
+			status = pthread_create(&threadID, NULL, handler, &params);
+			if (status != 0)                                                        
+				fprintf(stderr, "Error creating thread. %s\n", errmsg);
+			pthread_cond_wait(&params.done, &params.mutex);
+			//int i;
+			//for (i=0; i<100; i++)
+			//	serverSendFile(commfd, filenames[i]);
 		}
-		closeSocket(commfd);
 	}
 
+	pthread_mutex_destroy(&params.mutex);                                       
+	pthread_cond_destroy(&params.done);
 	shutdown(listenfd, SHUT_RDWR);
 	close(listenfd);
+
 	exit(0);
 }
 
@@ -152,4 +174,21 @@ void startServer()
 		fprintf(stderr, "Error while marking listenfd as passive socket. %s\n", errmsg);
 		exit(-1);
 	}
+}
+
+
+void* handler(void* args)
+{
+	int i, commfd;
+	pthread_mutex_lock(&(*(params_t*)(args)).mutex);                                                                          
+	commfd = (*(params_t*)(args)).commfd;                                         
+	pthread_mutex_unlock(&(*(params_t*)(args)).mutex);                           
+	pthread_cond_signal(&(*(params_t*)(args)).done);
+
+	printf("my sock: %d\n", commfd);
+	for (i=0; i<100; i++)                                               
+		serverSendFile(commfd, filenames[i]); 
+
+	closeSocket(commfd);
+	return NULL;
 }

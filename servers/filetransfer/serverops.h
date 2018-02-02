@@ -76,7 +76,7 @@ int sendFile(int sockfd, const void * buf, int len)
 		int sent = send(sockfd, pbuf, len, 0);
 		if (sent < 1)
 		{
-			fprintf(stderr, "cannot write to socket");
+			fprintf(stderr, "cannot write to socket\n");
 			return -1;
 		}
 
