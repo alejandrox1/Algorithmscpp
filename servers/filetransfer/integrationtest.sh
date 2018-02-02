@@ -26,8 +26,20 @@ set -x
 cd ${CWD}/${SDIR}
 nohup ./${SEXEC} &> /dev/null & 
 SERVPID=$!
-sleep 39
 echo "server started with pid ${SERVPID}" 
+while true;
+do
+	STAT=$(ps $SERVPID | tail -n 1 | awk '{print $3}')
+	if [ $STAT == "S+" ]; then 
+		echo Ready to Go 
+		break
+	elif [ $STAT == "STAT" ]; then
+		sudo fuser -n tcp -k 22000
+		exit 1
+	else
+		sleep 10
+	fi
+done
 ps $SERVEPID
 
 # Run client
