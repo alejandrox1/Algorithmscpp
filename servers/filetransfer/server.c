@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -13,6 +14,7 @@
 #include "serverops.h"
 
 
+#define NUMTHREADS 2
 #define CONNPORT "22000"
 #define CONNMAX 1000
 #define CONNBACKLOG 1000
@@ -21,43 +23,33 @@
 
 
 int listenfd;
-int clients[CONNMAX];
-
+char filenames[NFILES][FNAMESIZE];
 void startServer();
-
 void init()
 {
 	srand(time(NULL));
 
-	int i;                                                                      
-	for (i=0; i<CONNMAX; i++)                                                   
-		clients[i] = -1;
 }
 
 int main()
 {
-	char errmsg[ERRMSG];
-	struct sockaddr_in clientaddr;
-	socklen_t addrlen;
-	int slot = 0;
-
 	/* SERVER STARTUP */
 	init();
 
 	/* GENERATE FILES */
-	char filenames[NFILES][FNAMESIZE];
 	clock_t t = clock();
 	createNFiles(NFILES);
 	t = clock() - t;
 	fprintf(stdout, "Time taken to create files %f\n", ((double)t)/CLOCKS_PER_SEC);
 	listFiles(filenames);
-	//for (i=0; i<NFILES; i++)
-	//	printf("- %s\n", filenames[i]);
 
 	/* CONFIGURE SERVER */
 	startServer();
 
 	/* ACCEPT CONNECTIONS */
+	char errmsg[ERRMSG];                                                        
+	struct sockaddr_in clientaddr;                                              
+	socklen_t addrlen;
 	while (1)
 	{
 		// System call extracts the 1st connection request on queue of pending
@@ -65,10 +57,10 @@ int main()
 		// connected socket, returning a file descriptor refereing to that 
 		// socket.
 		addrlen = sizeof(clientaddr);
-		clients[slot] = accept(listenfd, (struct sockaddr *)&clientaddr, &addrlen);
+		int commfd = accept(listenfd, (struct sockaddr *)&clientaddr, &addrlen);
 			
 		// Error accepting connection.
-		if (clients[slot] < 0)
+		if (commfd < 0)
 		{	
 			getError(errno, errmsg);
 			fprintf(stderr, "Error accepting request. %s\n", errmsg);
@@ -86,12 +78,10 @@ int main()
 		else 
 		{
 			int i;
-			for (i=0; i<3; i++)
-				serverSendFile(clients[slot], filenames[i]);
+			for (i=0; i<500; i++)
+				serverSendFile(commfd, filenames[i]);
 		}
-		closeSocket(clients[slot]);
-		clients[slot] = -1;
-		slot = (slot+1) % CONNMAX;
+		closeSocket(commfd);
 	}
 
 	shutdown(listenfd, SHUT_RDWR);
