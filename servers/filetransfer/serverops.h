@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <openssl/md5.h>
 #include "errutilities.h"
+#include "tcputilities.h"
 
 #if defined(__linux__)                                                          
 #   include <endian.h>                                                          

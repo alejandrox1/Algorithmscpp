@@ -1,4 +1,3 @@
-#include <pthread.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -10,8 +9,9 @@
 #include <unistd.h>
 #include "errutilities.h"
 #include "fileutilities.h"
-#include "tcputilities.h"
+#include "pthrutils.h"
 #include "serverops.h"
+#include "tcputilities.h"
 
 
 #define NUMTHREADS 2
@@ -21,14 +21,6 @@
 #define ERRMSG 1024
 #define NFILES 1000
 
-struct params
-{
-	pthread_mutex_t mutex;                                                      
-	pthread_cond_t done;                                                        
-	int commfd;                                                                      
-};
-
-typedef struct params params_t;
 
 int listenfd;
 char filenames[NFILES][FNAMESIZE];
@@ -56,11 +48,11 @@ int main()
 	startServer();
 
 	/* ACCEPT CONNECTIONS */
-	int status;
+	int status, tid = 0;
 	char errmsg[ERRMSG];                                                        
 	struct sockaddr_in clientaddr;                                              
 	socklen_t addrlen;
-	pthread_t threadID;                                                         
+	pthread_t threads[NUMTHREADS];                                                         
     params_t params;
 	pthread_mutex_init (&params.mutex, NULL);                                   
 	pthread_cond_init (&params.done, NULL);
@@ -73,7 +65,6 @@ int main()
 		// socket.
 		addrlen = sizeof(clientaddr);
 		int commfd = accept(listenfd, (struct sockaddr *)&clientaddr, &addrlen);
-		printf("accepted: %d\n", commfd);		
 		// Error accepting connection.
 		if (commfd < 0)
 		{	
@@ -93,13 +84,11 @@ int main()
 		else 
 		{
 			params.commfd = commfd;
-			status = pthread_create(&threadID, NULL, handler, &params);
+			status = pthread_create(&threads[tid], NULL, handler, &params);
 			if (status != 0)                                                        
 				fprintf(stderr, "Error creating thread. %s\n", errmsg);
 			pthread_cond_wait(&params.done, &params.mutex);
-			//int i;
-			//for (i=0; i<100; i++)
-			//	serverSendFile(commfd, filenames[i]);
+			tid = (tid+1) % NUMTHREADS;
 		}
 	}
 
@@ -185,8 +174,7 @@ void* handler(void* args)
 	pthread_mutex_unlock(&(*(params_t*)(args)).mutex);                           
 	pthread_cond_signal(&(*(params_t*)(args)).done);
 
-	printf("my sock: %d\n", commfd);
-	for (i=0; i<100; i++)                                               
+	for (i=0; i<NFILES; i++)                                               
 		serverSendFile(commfd, filenames[i]); 
 
 	closeSocket(commfd);
