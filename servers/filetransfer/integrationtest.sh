@@ -26,27 +26,33 @@ set -x
 cd ${CWD}/${SDIR}
 nohup ./${SEXEC} &> /dev/null & 
 SERVPID=$!
-sleep 40
+sleep 39
 echo "server started with pid ${SERVPID}" 
+ps $SERVEPID
 
 # Run client
 cd ${CWD}/${CDIR}
-./${CEXEC}
+time ./${CEXEC}
 echo
 
 # check transfered files
-ls -l
-echo
-ls -lh
+# only usefule when comparing a handful of transfers
+#ls -l
+#echo
+#ls -lh
 
 set +x
+[ $(ps $SERVPID | tail -n 1 | awk '{print $3}') == "S+" ] && echo Ready to Go
+ps $SERVPID
+
 # Compare transfered files with the originals
+echo "comparing all files with diff and xxd..."
 for i in $(ls ${CWD}/${CDIR}/*.out | xargs -n 1 basename); 
 do
 	diff <(xxd ${CWD}/${CDIR}/${i}) <(xxd ${CWD}/${SDIR}/${i})
 done
 
-cat ${CWD}/${CDIR}/client.log
-cat ${CWD}/${SDIR}/server.log
+echo "comparing sorted log files..."
+diff <(sort ${CWD}/${CDIR}/client.log) <(sort ${CWD}/${SDIR}/server.log)
 
 kill $SERVPID
