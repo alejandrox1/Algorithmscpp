@@ -27,6 +27,7 @@ cd ${CWD}/${SDIR}
 nohup ./${SEXEC} &> /dev/null & 
 SERVPID=$!
 echo "server started with pid ${SERVPID}" 
+set +x
 while true;
 do
 	STAT=$(ps $SERVPID | tail -n 1 | awk '{print $3}')
@@ -37,14 +38,15 @@ do
 		sudo fuser -n tcp -k 22000
 		exit 1
 	else
-		sleep 10
+		sleep 5
 	fi
 done
 ps $SERVEPID
 
+set -x
 # Run client
 cd ${CWD}/${CDIR}
-time ./${CEXEC}
+/usr/bin/time --verbose ./${CEXEC}
 echo
 
 # check transfered files
