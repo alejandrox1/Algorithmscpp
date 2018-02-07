@@ -50,7 +50,7 @@ void* alarm_thread(void* arg)
 			else
 				sleep_time = alarm->time - now;
 #ifdef DEBUG
-			printf("[waiting: %d(%d)\"%s\"]\n", alarm->time, sleep_time, alarm->message);
+			printf("[waiting: %ld(%d)\"%s\"]\n", alarm->time, sleep_time, alarm->message);
 #endif
 		}
 
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
 			printf("[List: ");
 			for (next = alarm_list; next != NULL; next = next->link)
-				printf("%d(%d)[\"%s\"] ", next->time, next->time-time(NULL), next->message);
+				printf("%ld(%ld)[\"%s\"] ", next->time, next->time-time(NULL), next->message);
 			printf("]\n");
 #endif
 			
