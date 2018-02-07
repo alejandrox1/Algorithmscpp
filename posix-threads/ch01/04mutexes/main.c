@@ -5,7 +5,7 @@
 
 
 typedef struct alarm_tag {
-	struct alarm_tag	*link;
+	struct alarm_tag    *link;
 	int                 seconds;
 	time_t              time;
 	char                message[64];
