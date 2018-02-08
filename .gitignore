@@ -2,6 +2,9 @@
 *.key  
 *.pem
 
+# Networking
+networking/unix_networkprog_src/
+
 # some compiling going on
 *.o
 
