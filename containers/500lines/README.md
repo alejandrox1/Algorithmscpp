@@ -12,7 +12,7 @@
 
 * `linux/sched.h` only has cloning flags but not `clone()` declaration.
 
-* ```
+```
  contained.c:487:29: error: ‘SCMP_FAIL’ undeclared (first use in this function)
       || seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(chmod), 1,
  ```
