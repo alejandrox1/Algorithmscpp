@@ -1,6 +1,10 @@
 ;
 ; Boot sector to read sectors from boot disk.
 ;
+; Registers used:
+;
+; dh number of sectors to be read.
+; dl drive to read from.
 [org 0x7c00]
 
 mov [BOOT_DRIVE], dl    ; BIOS stores our boot drive in dl.
@@ -8,9 +12,9 @@ mov [BOOT_DRIVE], dl    ; BIOS stores our boot drive in dl.
 mov bp, 0x8000          ; We set our stack safely away.
 mov sp, bp
 
-mov bx, 0x9000          ; Load 5 sectors to 0x0000 (es):0x9000(bx)
-mov dh, 5               
-mov dl, [BOOT_DRIVE]    ; From boot disk.
+mov bx, 0x9000          ; es:bx = 0x0000:0x9000
+mov dh, 5               ; number of sectors to be read.
+mov dl, [BOOT_DRIVE]    
 call disk_load
 
 mov dx, [0x9000]        ; Print out the first loaded word, which we expect to 
