@@ -18,7 +18,7 @@ mov al, [bx]
 int 0x10              ; Does this print an X?
 
 ; Fourth attempt
-mov al, [0x7c1e]      ; X was 30 bytes from the offset (see od dump).
+mov al, [0x7c1d]      ; X was 29 bytes from the offset (see od dump). Look for ascii 0x58
 int 0x10              ; Does this print an X?
 
 jmp $                 ; Jump forever
