@@ -9,6 +9,15 @@
 ;
 ; 	dx holds the hex value to be printed.
 ;
+; Some ASCII values
+;
+; D   H   C
+; 48  30  0    17 from 0-A
+; 57  39  9
+; 65  41  A
+; 90  5A  Z
+; 97  61  a
+; 122 7A  z
 %include "print_string.asm"
 
 print_hex:
@@ -20,12 +29,12 @@ print_hex:
  	dec cx
 
 	mov ax, dx       ; We will use ax for comparisons.
-	shr dx, 4        ; dx will continuously be decreased by one digit, hence cx.
+	shr dx, 4        ; dx will continuously be shifted by one hex digit, hence cx.
 	and ax, 0xf      ; mask ah to get last 4 bits (0xf gets the most significant part).
 
 	mov bx, HEX_OUT 
 	add bx, 2        ; skip the '0x' part.
-	add bx, cx
+	add bx, cx       ; modify string right to left.
 
 	cmp ax, 0xa      ; check to see if it corresponds to a letter or a number.
 	jl set_letter    ; If number then set the value, else, add 7.
