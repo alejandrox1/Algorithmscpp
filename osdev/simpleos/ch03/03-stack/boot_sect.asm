@@ -3,8 +3,8 @@
 ;
 mov ah, 0x0e    ; int 10/ah = 0eh -> scrolling teletype BIOS routine.
 
-mov bp, 0x800   ; Set the base of the stack a little above where the BIOS loads 
-mov sp, bp      ; the boot sector.
+mov bp, 0x8000   ; Set the base of the stack a little above where the BIOS loads 
+mov sp, bp       ; the boot sector.
 
 push 'o'        ; Push chars into stack. These will be pushed as 16-bit values,
 push 'l'        ; so the most significant byte will be added by assembler as 
