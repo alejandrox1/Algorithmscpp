@@ -26,8 +26,8 @@ print_string_pm:
 	cmp al, 0
 	je print_string_pm_done
 
-	mov [edx], ax         ; Store char and attributes at current char cell.
-	add edx, 2             ; Move to next char cell in vid mem.
+	mov [edx], ax          ; Store char and attributes at current char cell.
+	add edx, 2             ; Move to next char cell in vid mem (1byte for color another for char).
 	add ebx, 1             ; Increment to next char on screen.
 
 	jmp print_string_pm_loop
