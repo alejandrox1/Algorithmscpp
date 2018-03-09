@@ -41,7 +41,7 @@ gdt_descriptor:
 
 ; Useful constants for the GDT segment descriptor offsets, which are what 
 ; segment registers must contain when in protected mode.
-; For example, when we set DS = 0x10 in PM, the cu knows that we mean to use 
+; For example, when we set DS = 0x10 in PM, the cpu knows that we mean to use 
 ; the segment described at offset 0x10 (16 bytes) in our GDT, which in our case
 ; is in the data segment (0x0 -> NULL, 0x08 -> CODE, 0x10 -> DATA).
 CODE_SEG equ gdt_code - gdt_start
